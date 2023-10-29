@@ -1,11 +1,15 @@
 <script setup>
 import DataForm from './WelcomeComponents/DataForm.vue';
 import lineChart from './WelcomeComponents/LineChart.vue';
-import { ref, nextTick, provide } from 'vue'
+import ProgressImage from './WelcomeComponents/ProgressImage.vue';
+import { ref, nextTick, provide ,computed} from 'vue'
 import { useStorage } from '@vueuse/core'
 import { STORAGE_KEY } from '@/config/config'
-const params = ref({});
+const params = ref({
+});
 const line = ref(null)
+// 初始数据节点，用于点击后展示示意图
+const dataIndex = ref(0)
 // 接受数据变化，调用
 function recieveData(data) {
   // 调用计算过程
@@ -190,13 +194,23 @@ function simpleCreate(data) {
     line.value.createChart()
   })
 }
+function setDataIndex(index){
+  console.log(index);
+  dataIndex.value = index
+}
+const showProgress = computed(()=>{
+  let arr = params.value?.dataArr||[0]
+  return arr[dataIndex.value];
+})
 provide("createChart", recieveData)
+provide("setDataIndex", {dataIndex,setDataIndex})
 </script>
 
 <template>
   <div class="main">
     <DataForm @submit="recieveData" @save="saveData" />
     <lineChart :data="params" ref="line" />
+    <ProgressImage :progess="showProgress" /> 
   </div>
 </template>
 <style scoped lang="less">

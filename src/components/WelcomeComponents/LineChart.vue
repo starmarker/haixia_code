@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject} from 'vue'
 import * as echarts from 'echarts';
 import DataHistory from '../WelcomeComponents/DataHistory.vue';
 
 // 基于准备好的dom，初始化echarts实例
-const props = defineProps(["data"]);
+const props = defineProps(["data"]),{setDataIndex} = inject("setDataIndex");
 let myChart;
 onMounted(() => {
     myChart = echarts.init(document.getElementById('mychart'));
@@ -13,6 +13,7 @@ onMounted(() => {
         let i = param.dataIndex;
         if(i){ //这里需要排除掉前边计算过程中push的0
             // 这里做data.value内部值的修改，主要是剩余物相关的数据，因为每个节点不一样
+            setDataIndex(i)
         }
         
     })
@@ -53,6 +54,14 @@ const createChart = () => {
         value: props.data?.water + ' 天'
     },
     {
+        label: "初始质量",
+        value: props.data?.premg + ' mg'
+    },
+    {
+        label: "表面积",
+        value: props.data?.area + ' 平方厘米'
+    },
+    {
         label: "溶后体积",
         value: props.data?.remain || 0 + ' 方'
     }]
@@ -88,7 +97,7 @@ defineExpose({ createChart })
 <template>
     <div class="chart-container">
         <div class="chart-box">
-            <div id="mychart" style="min-width:400px;min-height: 100px;"></div>
+            <div id="mychart" style="width:100%;min-height: 100px;"></div>
             <a-divider direction="vertical" />
             <DataHistory />
         </div>
@@ -117,7 +126,7 @@ defineExpose({ createChart })
     }
 
     .detail-box {
-        height: 200px;
+        height: 240px;
         padding: 20px;
         width: 100%;
     }

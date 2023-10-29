@@ -34,7 +34,7 @@ import TheWelcome from '../components/TheWelcome.vue'
 .container {
   height: 100vh;
   width: 100%;
-
+  box-sizing: border-box;
   & :deep(.arco-layout-header),
   & :deep(.arco-layout-footer),
   & :deep(.arco-layout-sider-children),

@@ -97,7 +97,7 @@ defineExpose({ createChart })
 <template>
     <div class="chart-container">
         <div class="chart-box">
-            <div id="mychart" style="width:100%;min-height: 100px;"></div>
+            <div id="mychart" style="width:calc(100% - 300px);min-height: 100px;"></div>
             <a-divider direction="vertical" />
             <DataHistory />
         </div>
@@ -118,7 +118,7 @@ defineExpose({ createChart })
     display: flex;
     border: 1px solid #cacaca;
     flex-direction: column;
-
+    width: calc(100% - 600px);
     .chart-box {
         margin: 0 20px;
         display: flex;

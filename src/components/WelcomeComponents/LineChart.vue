@@ -1,13 +1,21 @@
 <script setup>
-import { defineExpose, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import * as echarts from 'echarts';
 import DataHistory from '../WelcomeComponents/DataHistory.vue';
 
 // 基于准备好的dom，初始化echarts实例
-const props = defineProps(["data"])
+const props = defineProps(["data"]);
 let myChart;
 onMounted(() => {
     myChart = echarts.init(document.getElementById('mychart'));
+    // 节点被点击时
+    myChart.on("click",param =>{
+        let i = param.dataIndex;
+        if(i){ //这里需要排除掉前边计算过程中push的0
+            // 这里做data.value内部值的修改，主要是剩余物相关的数据，因为每个节点不一样
+        }
+        
+    })
 })
 const data = ref([])
 const createChart = () => {
@@ -54,7 +62,10 @@ const createChart = () => {
             text: '溶解预测数据'
         },
         tooltip: {},
+        
         xAxis: {
+            type:'category', 
+            boundaryGap: false,      
             data: props.data?.daysArr
         },
         yAxis: {
@@ -64,6 +75,7 @@ const createChart = () => {
             {
                 name: '溶解比例',
                 type: 'line',
+                symbolSize: 8,
                 data: props.data?.dataArr,
                 smooth: true
             }
@@ -76,7 +88,7 @@ defineExpose({ createChart })
 <template>
     <div class="chart-container">
         <div class="chart-box">
-            <div id="mychart" style="width:100%;min-height: 100px;"></div>
+            <div id="mychart" style="min-width:400px;min-height: 100px;"></div>
             <a-divider direction="vertical" />
             <DataHistory />
         </div>

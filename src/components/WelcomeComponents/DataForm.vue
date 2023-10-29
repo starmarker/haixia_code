@@ -10,10 +10,24 @@ const data = reactive({
     size: '',//公共尺寸
     days: 0 // 入井天数
 })
+
+//zhx
+// const datademo = reactive({
+//     block: '',//区块
+//     tuneNo: '',//井号
+//     concentration: 5,//浓度
+//     temprature: 30,//温度
+//     yield: 5,//产量
+//     water: 100,//产水量
+//     size: '',//公共尺寸
+//     days: 0, // 入井天数
+//     premg:0,//初始质量
+//     area:0//表面积
+// })
 const blocks = ref([]), sizes = ref([]);
 blocks.value = ["威远", "长宁", "致密气"];
 sizes.value = ["2.3/8\"", "2.7/8\"", "3.1/2\""];
-const emit = defineEmits(['submit'])
+const emit = defineEmits(['submit','save'])
 const handleSubmit = () => {
     emit('submit', data)
 }
@@ -43,7 +57,7 @@ const saveRecord = () => {
                 </a-input-number>
             </a-form-item>
             <a-form-item field="temprature" label="温度">
-                <a-input-number v-model="data.temprature" placeholder="温度" :min="-20" :max="120">
+                <a-input-number v-model="data.temprature" placeholder="温度" :min="-70" :max="300">
                     <template #suffix>
                         ℃
                     </template>
@@ -70,6 +84,12 @@ const saveRecord = () => {
             </a-form-item>
             <a-form-item field="days" label="入井天数">
                 <a-input-number v-model="data.days" placeholder="入井天数" :min="1" />
+            </a-form-item>
+            <a-form-item field="premg" label="初始质量mg">
+                <a-input-number v-model="data.premg" placeholder="mg" :min="1"/>
+            </a-form-item>
+            <a-form-item field="area" label="表面积">
+                <a-input-number v-model="data.area" placeholder="平方厘米" :min="1" />
             </a-form-item>
         </a-form>
         <a-space direction="vertical" fill class="btn-grop">

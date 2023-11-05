@@ -8,22 +8,11 @@ const data = reactive({
     yield: 5,//产量
     water: 100,//产水量
     size: '',//公共尺寸
-    days: 0 // 入井天数
+    days: 0, // 入井天数
+    premg:0, //初始质量
+    area:0  //比表面积
 })
 
-//zhx
-// const datademo = reactive({
-//     block: '',//区块
-//     tuneNo: '',//井号
-//     concentration: 5,//浓度
-//     temprature: 30,//温度
-//     yield: 5,//产量
-//     water: 100,//产水量
-//     size: '',//公共尺寸
-//     days: 0, // 入井天数
-//     premg:0,//初始质量
-//     area:0//表面积
-// })
 const blocks = ref([]), sizes = ref([]);
 blocks.value = ["威远", "长宁", "致密气"];
 sizes.value = ["2.3/8\"", "2.7/8\"", "3.1/2\""];
@@ -33,7 +22,6 @@ const handleSubmit = () => {
 }
 const saveRecord = () => {
     emit('save', data)
-
 }
 </script>
 
@@ -89,7 +77,7 @@ const saveRecord = () => {
                 <a-input-number v-model="data.premg" placeholder="mg" :min="1"/>
             </a-form-item>
             <a-form-item field="area" label="表面积">
-                <a-input-number v-model="data.area" placeholder="平方厘米" :min="1" />
+                <a-input-number v-model="data.area" placeholder="c㎡" :min="1" />
             </a-form-item>
         </a-form>
         <a-space direction="vertical" fill class="btn-grop">

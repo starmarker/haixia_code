@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>菜单一页面预留</h1>
+    <h1>菜单四页面预留</h1>
   </div>
 </template>
 

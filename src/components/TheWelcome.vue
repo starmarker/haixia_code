@@ -2,9 +2,11 @@
 import DataForm from './WelcomeComponents/DataForm.vue';
 import lineChart from './WelcomeComponents/LineChart.vue';
 import ProgressImage from './WelcomeComponents/ProgressImage.vue';
-import { ref, nextTick, provide ,computed} from 'vue'
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEY } from '@/config/config'
+import { ref, nextTick, provide ,computed} from 'vue';
+import { useStorage } from '@vueuse/core';
+import { STORAGE_KEY } from '@/config/config';
+import sycs from '@/public/datajson1.json'
+
 const params = ref({
 });
 const line = ref(null)
@@ -13,7 +15,12 @@ const dataIndex = ref(0)
 // 接受数据变化，调用
 function recieveData(data) {
   // 调用计算过程
-  const result = calculateDataNew(data)
+  var result;
+  if(!data.daysArr){
+    result = calculateDataNew(data)    
+  }else{
+     result = data;
+    }
   params.value = result;
   nextTick(() => {
     console.log(result);
@@ -125,10 +132,25 @@ function calculateDataNew(data) {
   lineX.push(0);
   lineY.push(0);
   while (y1 > 0) {
-    y11 = residualmass1(rjtime, totaltime, m);
+
+    if(T>75&&T<=150)
+    {//调用拟合公式1
+      y11 = residualmass1(rjtime, totaltime, m);
+    }
+    else if(T>=30&&T<=75)
+    {//调用拟合公式2
+      y11 = residualmass2(rjtime,totaltime,m,T,p);
+    }
+    else{
+      //温度超出范围
+    }
     //溶解率 %
     var rjl = 1.0 - y11 / data.premg;
-    lineX.push(rjtime);
+    lineX.push(rjtime+"h");
+    if(y11<=0)
+    {
+      rjl=1;
+    }
     lineY.push(rjl * 100);
     y1 = y11;
     m = y11;//下一轮初始质量等于本次剩余质量
@@ -165,7 +187,7 @@ function residualmass1(t, t1, m) {
     yt = m - 127.5 * Math.pow(t, 2);
   }
   else if (t > 2.47 && t < (t1 - 1.33)) {
-    yt = ((945.0458 - m) * (t - 2.47)) / (t1 - 3.8) + m - 777.8648;
+    yt = ((945.0458 - m) / (t1 - 3.8))* (t - 2.47)  + m - 777.8648;
   }
   else if (t >= (t1 - 1.33) && t <= t1) {
     yt = 125.7 * (t1 - t);
@@ -175,17 +197,56 @@ function residualmass1(t, t1, m) {
   }
   return yt;
 }
-//单调拟合2：
-function residualmass2() {
-
+//单调拟合2：时刻t,总拟合时间t1,初始质量m,温度T，浓度p
+function residualmass2(t,t1,m,T,p) {
+  //平台时间t2
+  var t2;
+  if(T<=60)
+  {
+    t2 = 64.54001 + 2.025485*T - 26.1366063*Math.sqrt(T) + 30.6369667*Math.sqrt(p) - 0.2152005*T*p;
+  }
+  else if(T>60&&T<=90)
+  {
+    t2 = 3.46 - T/30;
+  }
+  else{
+    t2 = 0.46
+  }
+  //剩余质量
+  var yt2;
+  if(t>=0&&t<=t2)
+  {
+    yt2 = m;
+  }
+  else if(t>=t2&&t<=(t1-4.85))
+  {
+    yt2 = ((446.7335 - m)/(t1-t2-4.85))*(t - t2) + m;
+  }
+  else if(t>=(t1-4.85)&&t<=t1)
+  {
+    yt2 = (t1 - t)*92.11;
+  }
+  else{
+    yt2 = 0;
+  }
+  return yt2;
 }
 // 接受保存历史记录的方法
 function saveData(data) {
+  
   // 调用计算过程
-  const result = calculateData(data);
+  //historydatalow();
+  const result = calculateDataNew(data);
   const state = useStorage(STORAGE_KEY, [])
   result.stamp = new Date().getTime()
   state.value.push(result)
+
+ // addhistory();
+}
+//历史数据加载
+function loadhistory()
+{
+
 }
 // 直接生成曲线图，用于历史数据生成
 function simpleCreate(data) {
@@ -197,6 +258,22 @@ function simpleCreate(data) {
 function setDataIndex(index){
   console.log(index);
   dataIndex.value = index
+}
+
+//新增一条实验参数 未完成
+function addhistory()
+{
+  //var sycs = // ('@/public/datajson1.json');
+  
+  // let js = sycs.sycs;
+    const d = {
+        id: '2023003',
+        wd: '75',
+        nd:'1.5',
+        mj:'9.36',
+        zl:'2664'
+    };
+    sycs.sycs.push(d);
 }
 const showProgress = computed(()=>{
   let arr = params.value?.dataArr||[0]

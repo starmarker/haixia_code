@@ -59,7 +59,9 @@
 }
 
 body {
-  min-height: 100vh;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-y: hidden;
   color: var(--color-text);
   background: var(--color-background);
   transition:

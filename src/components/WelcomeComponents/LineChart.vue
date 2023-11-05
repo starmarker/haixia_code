@@ -19,8 +19,21 @@ onMounted(() => {
     })
 })
 const data = ref([])
+const tooltipFormatter = (params) =>{
+    let str = ''
+    for(let i in data.value){
+        str = str + `${data.value[i].label}:${data.value[i].value} <br />`
+    }
+    str += `溶解比例：${params.value}`
+    return str;
+}
 const createChart = () => {
-    if (!props.data || !props.data.days) return;
+{
+    // if (!props.data || !props.data.days) return;
+    if(!props.data) return;
+    if(!props.data.days){
+        updateCharts(props.data);
+    }else{
     data.value = [{
         label: "区块",
         value: props.data?.block
@@ -70,8 +83,9 @@ const createChart = () => {
         title: {
             text: '溶解预测数据'
         },
-        tooltip: {},
-        
+        tooltip:{
+            formatter:tooltipFormatter
+        },
         xAxis: {
             type:'category', 
             boundaryGap: false,      
@@ -84,8 +98,60 @@ const createChart = () => {
             {
                 name: '溶解比例',
                 type: 'line',
-                symbolSize: 8,
+                symbolSize: 12,
                 data: props.data?.dataArr,
+                smooth: true
+            }
+        ]
+    });
+    
+}
+}
+}
+function updateCharts(data2){
+    data.value = [
+    {
+        label: "浓度",
+        value: data2.data?.nd
+    },
+    {
+        label: "温度",
+        value: data2.data?.wd + ' ℃'
+    },
+    {
+        label: "初始质量",
+        value:  data2.data?.zl + ' mg'
+    },
+    {
+        label: "表面积",
+        value: data2.data?.mj + ' cm2'
+    },
+    {
+        label: "其他",
+        value: data2.data?.other
+    }]
+    // 绘制图表
+    myChart.setOption({
+        title: {
+            text: '溶解数据'
+        },
+        tooltip:{
+            formatter:tooltipFormatter
+        },       
+        xAxis: {
+            type:'category', 
+            boundaryGap: false,      
+            data: data2.daysArr
+        },
+        yAxis: {
+            type: "value"
+        },
+        series: [
+            {
+                name: '溶解比例',
+                type: 'line',
+                symbolSize: 8,
+                data: data2.dataArr,
                 smooth: true
             }
         ]
@@ -97,7 +163,7 @@ defineExpose({ createChart })
 <template>
     <div class="chart-container">
         <div class="chart-box">
-            <div id="mychart" style="width:calc(100% - 300px);min-height: 100px;"></div>
+            <div id="mychart" style="width:100%;min-height: 100px;"></div>
             <a-divider direction="vertical" />
             <DataHistory />
         </div>
@@ -118,7 +184,7 @@ defineExpose({ createChart })
     display: flex;
     border: 1px solid #cacaca;
     flex-direction: column;
-    width: calc(100% - 600px);
+
     .chart-box {
         margin: 0 20px;
         display: flex;

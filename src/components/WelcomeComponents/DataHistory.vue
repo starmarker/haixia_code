@@ -70,7 +70,7 @@ function gethistorylist() {
     <div class="his_container">
         <a-tabs default-active-key="2">
             <a-tab-pane key="1" title="历史数据1">
-                <a-scrollbar style="height:calc(100vh - 500px);overflow: auto;">
+                <a-scrollbar style="height:calc(100vh - 370px);overflow: auto;">
                 <div class="his-list">
                     <a-radio-group direction="vertical" v-model="current" @change="historyChange">
                         <a-radio v-for="(el, index) in state" :value="index">{{ el.block }}区块-{{ el.tuneNo }}号井{{
@@ -80,7 +80,7 @@ function gethistorylist() {
             </a-scrollbar>
             </a-tab-pane>
             <a-tab-pane key="2" title="历史数据2">
-                <a-scrollbar style="height:calc(100vh - 500px);overflow: auto;">
+                <a-scrollbar style="height:calc(100vh - 370px);overflow: auto;">
                 <div class="his-list">
                     <a-radio-group direction="vertical" v-model="current2" @change="historyChange2">
                         <a-radio v-for="(el, index) in state2" :value="index">{{ el.nd }}-{{ el.wd }}℃-{{ el.other

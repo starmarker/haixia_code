@@ -6,6 +6,7 @@ import DataHistory from '../WelcomeComponents/DataHistory.vue';
 // 基于准备好的dom，初始化echarts实例
 const props = defineProps(["data"]),{setDataIndex} = inject("setDataIndex");
 let myChart;
+
 onMounted(() => {
     myChart = echarts.init(document.getElementById('mychart'));
     // 节点被点击时
@@ -14,17 +15,29 @@ onMounted(() => {
         if(i){ //这里需要排除掉前边计算过程中push的0
             // 这里做data.value内部值的修改，主要是剩余物相关的数据，因为每个节点不一样
             setDataIndex(i)
-        }
-        
+        }       
+    })
+    window.addEventListener('resize',()=>{
+        myChart.resize()
+
     })
 })
 const data = ref([])
 const tooltipFormatter = (params) =>{
+    if(!props.data || params.dataIndex<=0)return;
     let str = ''
-    for(let i in data.value){
-        str = str + `${data.value[i].label}:${data.value[i].value} <br />`
+    let item = props.data.datadetail[params.dataIndex-1];
+    str +="时刻:"+item.time;
+    if(item.in_box>0){
+        str +="(放入真空)";
     }
-    str += `溶解比例：${params.value}`
+    str+=' <br />';
+    str +="反应前质量:"+item.weight_start+' <br />';
+    str +="反应后质量:"+item.weight_end+' <br />';
+    str +="反应时间:"+item.use_time+' <br />';
+    str +="比表面积:"+item.area+' <br />';
+    str +="溶解速率:"+item.speed+' <br />';
+    str += `总溶解比例：${params.value}%`;
     return str;
 }
 const createChart = () => {
@@ -92,7 +105,12 @@ const createChart = () => {
             data: props.data?.daysArr
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            axisLabel:{
+                show:true,
+                interval:'auto',
+                formatter:'{value}%'
+            }
         },
         series: [
             {
@@ -144,7 +162,12 @@ function updateCharts(data2){
             data: data2.daysArr
         },
         yAxis: {
-            type: "value"
+            type: "value",
+            axisLabel:{
+                show:true,
+                interval:'auto',
+                formatter:'{value}%'
+            }
         },
         series: [
             {
@@ -170,7 +193,7 @@ defineExpose({ createChart })
         <div class="detail-box">
             <a-divider direction="horizontal" />
             <div class="detail-container">
-                <a-descriptions :data="data" title="预测数据" :align="{ label: 'right' }" />
+                <a-descriptions :data="data" title="实验参数" :align="{ label: 'right' }" />
             </div>
         </div>
 
@@ -186,7 +209,7 @@ defineExpose({ createChart })
     flex-direction: column;
 
     .chart-box {
-        height:calc(100vh - 340px);
+        height:calc(100vh - 400px);
         margin: 0 20px;
         display: flex;
         flex-grow: 1;
@@ -194,7 +217,7 @@ defineExpose({ createChart })
 
     .detail-box {
         box-sizing: border-box;
-        height: 320px;
+        height: 280px;
         padding: 20px;
         width: 100%;
     }

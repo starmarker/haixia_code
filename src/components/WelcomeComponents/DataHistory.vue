@@ -6,6 +6,7 @@ import moment from 'moment'
 import sycs from '@/public/datajson1.json'
 import sysjH from '@/public/data-90-150.json'
 import sysjL from '@/public/data-30-75.json'
+// import fs from 'fs'
 
 const current = ref(null)
 const current2 = ref(null)
@@ -16,19 +17,20 @@ const showDate = (stamp) => {
     return moment(stamp).format('YYYYMMDD HH:mm:ss')
 }
 function historyChange(value) {
-
-    var s = state.value[value];
-    simpleCreate(state.value[value])
+    current.value = value
+    simpleCreate(state.value[current.value])
 }
 //选择数据改变@参数为选中数据的index
 function historyChange2(value) {
     //选中的实验参数
-    var cursycs = state2[value];
+    current2.value = value
+    var cursycs = state2[current2.value];
 
     //选中的实验数据
     var cu = getsysjlist(cursycs.id, cursycs.wd.split(',')[1]);
     var data2 = {
-        data: cursycs
+        data: cursycs,
+        datadetail:cu
     };
 
     var lineX = [0];
@@ -63,13 +65,19 @@ function getsysjlist(sycsid, wd) {
 function gethistorylist() {
 
 }
+// 切换tab
+function tabChange(){
+    current.value = null;
+    current2.value = null;
+}
 
 /**zhx */
 </script>
 <template>
     <div class="his_container">
-        <a-tabs default-active-key="2">
-            <a-tab-pane key="1" title="历史数据1">
+        <a-tabs default-active-key="2" @change="tabChange">        
+            
+            <a-tab-pane key="1" title="历史预测数据">
                 <a-scrollbar style="height:calc(100vh - 370px);overflow: auto;">
                 <div class="his-list">
                     <a-radio-group direction="vertical" v-model="current" @change="historyChange">
@@ -79,7 +87,7 @@ function gethistorylist() {
                 </div>
             </a-scrollbar>
             </a-tab-pane>
-            <a-tab-pane key="2" title="历史数据2">
+             <a-tab-pane key="2" title="溶解数据库">
                 <a-scrollbar style="height:calc(100vh - 370px);overflow: auto;">
                 <div class="his-list">
                     <a-radio-group direction="vertical" v-model="current2" @change="historyChange2">
@@ -87,7 +95,7 @@ function gethistorylist() {
                         }}c㎡</a-radio>
                     </a-radio-group>
                 </div>
-            </a-scrollbar>
+                </a-scrollbar>
             </a-tab-pane>
         </a-tabs>
 

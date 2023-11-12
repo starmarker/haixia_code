@@ -40,7 +40,7 @@ const saveRecord = () => {
             <a-form-item field="concentration" label="浓度">
                 <a-input-number v-model="data.concentration" placeholder="浓度" >
                     <template #suffix>
-                        ppm
+                        wt%
                     </template>                   
                 </a-input-number>
             </a-form-item>

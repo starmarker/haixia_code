@@ -5,8 +5,10 @@ import ProgressImage from './WelcomeComponents/ProgressImage.vue';
 import { ref, nextTick, provide ,computed} from 'vue';
 import { useStorage } from '@vueuse/core';
 import { STORAGE_KEY } from '@/config/config';
-import sycs from '@/public/datajson1.json'
+import test from '@/public/test.json'
+// import fs from 'fs'
 
+const loginstatus = 2; //登录状态 0普通用户，1高级用户，2未登录
 const params = ref({
 });
 const line = ref(null)
@@ -131,8 +133,9 @@ function calculateDataNew(data) {
 
   lineX.push(0);
   lineY.push(0);
+  var datadetail=[];
   while (y1 > 0) {
-
+   
     if(T>75&&T<=150)
     {//调用拟合公式1
       y11 = residualmass1(rjtime, totaltime, m);
@@ -146,18 +149,33 @@ function calculateDataNew(data) {
     }
     //溶解率 %
     var rjl = 1.0 - y11 / data.premg;
-    lineX.push(rjtime+"h");
     if(y11<=0)
     {
       rjl=1;
+      //rjtime = totaltime
     }
+    lineX.push(rjtime+"h");
     lineY.push(rjl * 100);
+    let datanode=
+    {
+     "sycsid": "",
+			"time": rjtime,
+			"weight_start": y1,
+			"weight_end": y11,
+			"weight_change": y1-y11,
+			"use_time": 1,
+			"area": s,
+			"speed": "",
+			"in_box": "0"//是否真空
+    }
+    datadetail.push(datanode);
     y1 = y11;
     m = y11;//下一轮初始质量等于本次剩余质量
     rjtime++;
   }
   obj.daysArr = lineX;
   obj.dataArr = lineY;
+  obj.datadetail = datadetail;
 
   return obj;
 }
@@ -168,8 +186,8 @@ function getTotaltime(m, s, T, p) {
   var b = 0.0992851 * s;
   var c = 0.968106 * T;
   var d = 2.05339 * (Math.pow(10, -3)) * Math.pow(T, 2);
-  var e = 71.557 * Math.log(T);
-  var f = 12.4135 * Math.log(p);
+  var e = 71.557 * Math.log(T);//Math.log10(T);
+  var f = 12.4135 * Math.log(p);//Math.log10(p);
   var g = 0.0543982 * T * p;
   //反应总时间t1
   var t1 = 260.212 + a - b + c - d - e - f + g;
@@ -205,7 +223,7 @@ function residualmass2(t,t1,m,T,p) {
   {
     t2 = 64.54001 + 2.025485*T - 26.1366063*Math.sqrt(T) + 30.6369667*Math.sqrt(p) - 0.2152005*T*p;
   }
-  else if(T>60&&T<=90)
+  else if(T>=60&&T<=90)
   {
     t2 = 3.46 - T/30;
   }
@@ -233,7 +251,9 @@ function residualmass2(t,t1,m,T,p) {
 }
 // 接受保存历史记录的方法
 function saveData(data) {
-  
+
+   // addhistory();
+
   // 调用计算过程
   //historydatalow();
   const result = calculateDataNew(data);
@@ -241,7 +261,7 @@ function saveData(data) {
   result.stamp = new Date().getTime()
   state.value.push(result)
 
- // addhistory();
+
 }
 //历史数据加载
 function loadhistory()
@@ -265,15 +285,64 @@ function addhistory()
 {
   //var sycs = // ('@/public/datajson1.json');
   
-  // let js = sycs.sycs;
-    const d = {
-        id: '2023003',
-        wd: '75',
-        nd:'1.5',
-        mj:'9.36',
-        zl:'2664'
-    };
-    sycs.sycs.push(d);
+  //  let js = sycs.sycs;
+//   //方法一
+//   const files = import.meta.glob("/src/public/test.json",{ eager: true });//globEage);import.meta.globEager 已经弃用，请使用 import.meta.glob('*', { eager: true }) 来代替
+//   const modules = {}
+//   for (const key in files) {
+//       // files[key]().then(res => {
+//       //     modules[key.replace(/(\.\/module\/|\.js)/g, '')] = res.default
+//       // })
+//   }
+// //方法二
+//     const d = {
+//         id: '2023003',
+//         wd: '75',
+//         nd:'1.5',
+//         mj:'9.36',
+//         zl:'2664'
+//     };
+//     // sycs.sycs.push(d);
+//     // 定义JSON数据
+//     var person = {name: "John", age: 30, city: "New York"};
+//     // 将JSON数据转换为JSON字符串
+//     var jsonString = JSON.stringify(person);
+//     // 将JSON字符串写入文件
+//     fs.writeFile('person.json', jsonString, function (err) {
+//     if (err) throw err;
+//     console.log('JSON文件已保存！');
+//     });
+
+  //   //方法三
+  //   let xhr = new XMLHttpRequest()
+  //   // const okStatus = document.location.protocol === 'file:' ? 0 : 200
+  //   xhr.open('GET', "/src/public/test.json", false)
+  //   //xhr.overrideMimeType('text/html;charset=utf-8') //默认为utf-8
+  //   xhr.send(null)
+  //   if(xhr.response)
+  //  {
+  //   var formData = new FormData();
+  //   formData.append("id",3);
+  //   formData.append("wd",87);
+  //   //xhr.open('POST',"/src/public/test.json",true);
+  //   xhr.overrideMimeType('text/html;charset=utf-8') //默认为utf-8
+  //   xhr.send(formData);
+  //  }
+
+    // return xhr.status === okStatus ? xhr.responseText : null
+    // var xmlHttpRequest = new XMLHttpRequest();
+    // var formData = new FormData(document.forms.user);
+    // xmlHttpRequest.open('POST','/api/onsave',true);
+    // xmlHttpRequest.send(formData);
+
+    //方法四
+    const content = test.sycs;
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const fileName = "example.txt";
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
 }
 const showProgress = computed(()=>{
   let arr = params.value?.dataArr||[0]
